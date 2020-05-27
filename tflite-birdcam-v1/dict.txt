@@ -1,0 +1,10 @@
+nobody
+chipmunk
+sparrow
+grackle
+house-finch
+cardinal-female
+cowbird
+redwing-female
+goldfinch
+redwing-male
