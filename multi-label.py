@@ -18,12 +18,18 @@ def load_labels(filename):
   with open(filename, 'r') as f:
     return [line.strip() for line in f.readlines()]
 
+def sort_file(path, dest, confidence):
+  bucket = round(confidence/10)*10
+  dir = 'unknown' if bucket < 50 else '{}-{}'.format(dest, bucket)
+  print('should move {} to {}'.format(path, dir))
+
+
+SORTED_DIR='/Users/bradparks/Projects/birdfeeder/sorted/'
 def mkdirs(labels):
   for dir in [x for x in labels if x != 'nobody']:
-    os.makedirs('sorted/'+dir,exist_ok=True)
-  for num in range(50,100,10):
-    dirname = 'nobody-%s' % num
-    os.makedirs('sorted/'+dirname,exist_ok=True)
+    for num in range(50,100,10):
+      dirname = '%s-%s' % (dir,num)
+      os.makedirs(SORTED_DIR+dirname,exist_ok=True)
 
 if __name__ == '__main__':
   parser = argparse.ArgumentParser()
@@ -78,12 +84,20 @@ if __name__ == '__main__':
       output_data = interpreter.get_tensor(output_details[0]['index'])
       results = np.squeeze(output_data)
 
-      top_k = results.argsort()[-5:][::-1]
+      top_k = results.argsort()[-1:][::-1]
       for i in top_k:
         if floating_model:
           print('{:08.6f}: {}'.format(float(results[i]), labels[i]))
+          print('Unexpected!')
         else:
           print('{:08.6f}: {}'.format(float(results[i] / 255.0), labels[i]))
+          confidence = float(results[0] / 255.0 * 100)
+
+      best_guess = labels[0]
+
+      sort_file(entry.path, best_guess, confidence)
+
+      # newline
       print(' ')
 
 exit()
