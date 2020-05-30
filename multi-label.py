@@ -1,9 +1,13 @@
 
+#
+#  about 6 minutes to process and move 1000 images
+#
+
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import os
+import os, shutil
 import argparse
 
 import numpy as np
@@ -14,22 +18,24 @@ TF_PATH='/Users/bradparks/Projects/birdfeeder/tf/tflite-birdcam-v1'
 LABEL_FILE=TF_PATH+'/dict.txt'
 MODEL_FILE=TF_PATH+'/model.tflite'
 
+SORTED_DIR='/Users/bradparks/Projects/birdfeeder/sorted/'
+
 def load_labels(filename):
   with open(filename, 'r') as f:
     return [line.strip() for line in f.readlines()]
 
-def sort_file(path, dest, confidence):
+def sort_file_into_dir(path, dest, confidence):
   bucket = round(confidence/10)*10
   dir = 'unknown' if bucket < 50 else '{}-{}'.format(dest, bucket)
   print('should move {} to {}'.format(path, dir))
+  shutil.move(path, '{}/{}/'.format(SORTED_DIR,dir))
 
-
-SORTED_DIR='/Users/bradparks/Projects/birdfeeder/sorted/'
 def mkdirs(labels):
-  for dir in [x for x in labels if x != 'nobody']:
+  for dir in labels:
     for num in range(50,100,10):
       dirname = '%s-%s' % (dir,num)
       os.makedirs(SORTED_DIR+dirname,exist_ok=True)
+  os.makedirs(SORTED_DIR+'unknown',exist_ok=True)
 
 if __name__ == '__main__':
   parser = argparse.ArgumentParser()
@@ -40,8 +46,6 @@ if __name__ == '__main__':
       required=True)
   args = parser.parse_args()
 
-
-  print('starting to process %s' % args.dir)
 
   labels = load_labels(LABEL_FILE)
   mkdirs(labels)
@@ -65,8 +69,6 @@ if __name__ == '__main__':
     for entry in it:
       print(count, entry.path)
       count+=1
-      if count >= 100:
-        break
 
       image = entry.path
       img = Image.open(image).resize((width, height))
@@ -95,7 +97,7 @@ if __name__ == '__main__':
 
       best_guess = labels[0]
 
-      sort_file(entry.path, best_guess, confidence)
+      sort_file_into_dir(entry.path, best_guess, confidence)
 
       # newline
       print(' ')
