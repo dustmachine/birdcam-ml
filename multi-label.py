@@ -99,8 +99,5 @@ if __name__ == '__main__':
 
       sort_file_into_dir(entry.path, best_guess, confidence)
 
-      # newline
-      print(' ')
-
 exit()
 
