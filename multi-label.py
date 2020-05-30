@@ -26,7 +26,7 @@ def load_labels(filename):
 
 def sort_file_into_dir(path, dest, confidence):
   bucket = int(round(confidence)/10)*10
-  print('confidence={}, bucket={}'.format(confidence,bucket))
+  #print('confidence={}, bucket={}'.format(confidence,bucket))
   dir = 'unknown' if confidence < 50 else '{}-{}'.format(dest, bucket)
   print('should move {} to {}'.format(path, dir))
   shutil.move(path, '{}/{}/'.format(SORTED_DIR,dir))
@@ -72,7 +72,11 @@ if __name__ == '__main__':
       count+=1
 
       image = entry.path
-      img = Image.open(image).resize((width, height))
+      try:
+        img = Image.open(image).resize((width, height))
+      except:
+        print('This file does not seem like an image: {}'.format(image))
+        continue
 
       # add N dim
       input_data = np.expand_dims(img, axis=0)
