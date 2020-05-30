@@ -25,8 +25,9 @@ def load_labels(filename):
     return [line.strip() for line in f.readlines()]
 
 def sort_file_into_dir(path, dest, confidence):
-  bucket = round(confidence/10)*10
-  dir = 'unknown' if bucket < 50 else '{}-{}'.format(dest, bucket)
+  bucket = int(round(confidence)/10)*10
+  print('confidence={}, bucket={}'.format(confidence,bucket))
+  dir = 'unknown' if confidence < 50 else '{}-{}'.format(dest, bucket)
   print('should move {} to {}'.format(path, dir))
   shutil.move(path, '{}/{}/'.format(SORTED_DIR,dir))
 
@@ -67,7 +68,7 @@ if __name__ == '__main__':
   directory = args.dir
   with os.scandir(directory) as it:
     for entry in it:
-      print(count, entry.path)
+      # print(count, entry.path)
       count+=1
 
       image = entry.path
@@ -91,11 +92,12 @@ if __name__ == '__main__':
         if floating_model:
           print('{:08.6f}: {}'.format(float(results[i]), labels[i]))
           print('Unexpected!')
+          exit()
         else:
           print('{:08.6f}: {}'.format(float(results[i] / 255.0), labels[i]))
-          confidence = float(results[0] / 255.0 * 100)
+          confidence = float(results[i] / 255.0 * 100)
+          best_guess = labels[i]
 
-      best_guess = labels[0]
 
       sort_file_into_dir(entry.path, best_guess, confidence)
 
