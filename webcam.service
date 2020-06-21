@@ -1,0 +1,34 @@
+#!/bin/bash
+#
+# also needs:   systemctl enable webcam
+#
+### BEGIN INIT INFO
+# Provides:          webcam
+# Required-Start:    $local_fs $remote_fs $network $syslog $named $apache2
+# Required-Stop:     $local_fs $remote_fs $network $syslog $named $apache2
+# Default-Start:     3
+# Default-Stop:      0 1 6
+# X-Interactive:     false
+# Short-Description: Bird feeder webcam capture
+# Description:       Start the webcam capture
+#  This script will start the python3 webcam capture
+### END INIT INFO
+
+
+. /lib/lsb/init-functions
+
+case "$1" in
+  start)
+        /usr/bin/python3 /home/pi/capture.py &
+	;;
+  stop)
+	;;
+  *)
+	echo "Usage: $SCRIPTNAME {start|stop}" >&2
+	exit 3
+	;;
+esac
+
+exit 0
+
+# vim: syntax=sh ts=4 sw=4 sts=4 sr noet
