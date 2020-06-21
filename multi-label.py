@@ -1,6 +1,7 @@
 
 #
 #  about 6 minutes to process and move 1000 images
+#  does about 6 per second on my MacBook
 #
 
 from __future__ import absolute_import
@@ -14,7 +15,7 @@ import numpy as np
 from PIL import Image
 import tensorflow as tf # TF2
 
-TF_PATH='/Users/bradparks/Projects/birdfeeder/tf/tflite-birdcam-v1'
+TF_PATH='/Users/bradparks/Projects/birdfeeder/models/model-export/icn/tflite-birdfeeder_model_v3-2020-06-21T00:33:38.441Z'
 LABEL_FILE=TF_PATH+'/dict.txt'
 MODEL_FILE=TF_PATH+'/model.tflite'
 
@@ -25,15 +26,20 @@ def load_labels(filename):
     return [line.strip() for line in f.readlines()]
 
 def sort_file_into_dir(path, dest, confidence):
-  bucket = int(round(confidence)/10)*10
+  if confidence > 80:
+    dir = '{}-80'.format(dest)
+  elif confidence > 50:
+    dir = '{}-50'.format(dest)
+  else:
+    dir = 'unknown'
+
   #print('confidence={}, bucket={}'.format(confidence,bucket))
-  dir = 'unknown' if confidence < 50 else '{}-{}'.format(dest, bucket)
   print('should move {} to {}'.format(path, dir))
   shutil.move(path, '{}/{}/'.format(SORTED_DIR,dir))
 
 def mkdirs(labels):
   for dir in labels:
-    for num in range(50,100,10):
+    for num in [50,80]:
       dirname = '%s-%s' % (dir,num)
       os.makedirs(SORTED_DIR+dirname,exist_ok=True)
   os.makedirs(SORTED_DIR+'unknown',exist_ok=True)

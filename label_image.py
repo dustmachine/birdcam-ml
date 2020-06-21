@@ -26,6 +26,9 @@ from PIL import Image
 
 import tensorflow as tf # TF2
 
+TF_PATH='/Users/bradparks/Projects/birdfeeder/models/model-export/icn/tflite-birdfeeder_model_v3-2020-06-21T00:33:38.441Z'
+LABEL_FILE=TF_PATH+'/dict.txt'
+MODEL_FILE=TF_PATH+'/model.tflite'
 
 def load_labels(filename):
   with open(filename, 'r') as f:
@@ -42,12 +45,12 @@ if __name__ == '__main__':
   parser.add_argument(
       '-m',
       '--model_file',
-      default='/tmp/mobilenet_v1_1.0_224_quant.tflite',
+      default=MODEL_FILE,
       help='.tflite model to be executed')
   parser.add_argument(
       '-l',
       '--label_file',
-      default='/tmp/labels.txt',
+      default=LABEL_FILE,
       help='name of file containing labels')
   parser.add_argument(
       '--input_mean',
